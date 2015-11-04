@@ -1,0 +1,102 @@
+<!doctype html>
+<html>
+<!-- Cyril Vedder          Final Project CIS 115        3/5/14 -->
+<head>
+    <title>Final Project: Paint Program</title>
+    <meta charset="utf-8">
+    <style>
+    canvas { background-color: white; border: 1px solid black; margin-right:350px; margin-left:350px;}
+    #colorPlacement { margin-top:-300px;}
+    #canvasControl { margin-left:900px; margin-top:-70px}
+    </style>
+    <script>
+    	//set my global variables
+    	var canvas;
+		var context;
+		var currentlyDrawing = false;
+		//initialize my mouse commands and canvas
+		window.onload = function() {
+  			canvas = document.getElementById("myCanvas");
+  			context = canvas.getContext("2d");
+
+  			canvas.onmousedown = startDrawing;
+  			canvas.onmouseup = stopDrawing;
+  			canvas.onmouseout = stopDrawing;
+  			canvas.onmousemove = draw;
+		}
+		//set the respective brush color when button is clicked
+		function changeBrushColor(color) {
+  			context.strokeStyle = color;
+		}
+		//set the respective brush thickness when button is clicked
+		function changeBrushThickness(thickness) {
+  			context.lineWidth = thickness;
+  		}
+		//when mouse is clicked, begin drawing where the cursor is
+		function startDrawing(event) {
+  			currentlyDrawing = true;
+  			
+  			context.beginPath();
+  			context.moveTo(event.clientX - canvas.offsetLeft, event.clientY - canvas.offsetTop);
+		}
+		//draw wherever the cursor moves
+		function draw(event) {
+  			if (currentlyDrawing == true) {
+    			var x = event.clientX - canvas.offsetLeft;
+    			var y = event.clientY - canvas.offsetTop;
+
+    			context.lineTo(x, y);
+    			context.stroke();
+    		}	
+		}
+		//if mouse is not clicked or moves out of the canvas boundary, stop drawing
+		function stopDrawing() {
+  			currentlyDrawing = false;
+		}
+		//save image to local storage
+		function saveCanvas() {
+			//Got the toDataURL() method from: https://developer.mozilla.org/en-US/docs/Web/API/HTMLCanvasElement
+			localStorage.setItem("myCanvas", canvas.toDataURL());
+		}
+		//load image from local storage
+		function loadCanvas() {
+			var img=new Image();
+			img.onload=function(){
+    			context.drawImage(img,0,0);
+			}
+			img.src=localStorage.getItem("myCanvas");
+		}
+		//clear image from canvas
+		function clearCanvas() {
+  			context.clearRect(0, 0, canvas.width, canvas.height);
+		}
+		//clear image from local storage
+		function clearFromLocalStorage() {
+			localStorage.removeItem("myCanvas");
+		}
+		
+    </script>
+</head>
+<body>
+    <canvas width="500" height="500" id="myCanvas"></canvas>
+    <br>
+    <p id="colorPlacement">Brush Color:
+    <input type="button" style="color:red" value="Red" onclick="changeBrushColor('rgb(255,0,0)')">
+    <input type="button" style="color:green" value="Green" onclick="changeBrushColor('rgb(0,255,0)')">
+    <input type="button" style="color:blue" value="Blue" onclick="changeBrushColor('rgb(0,0,255)')">
+    <br>
+    Brush Size:
+    <input type="button" value="Small" onclick="changeBrushThickness(5)">
+    <input type="button" value="Medium" onclick="changeBrushThickness(10)">
+    <input type="button" value="Large" onclick="changeBrushThickness(15)">
+    </p>
+    <br>
+    <p id="canvasControl">
+    <input type="button" value="Save" onclick="saveCanvas()">
+    <input type="button" value="Load" onclick="loadCanvas()">
+    <input type="button" value="Clear From Canvas" onclick="clearCanvas()">
+    <br>
+    <input type="button" value="Clear From Local Storage" onclick="clearFromLocalStorage()">
+    </p>
+</body>
+</html>

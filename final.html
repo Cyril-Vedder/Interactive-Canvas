@@ -1,0 +1,95 @@
+<!doctype html>
+<html>
+<head>
+    <title>Paint</title>
+    <meta charset="utf-8">
+    <style>canvas { border: 1px solid black; }</style>
+    <script>
+    	var canvas;
+		var context;
+		var mouseDown = false;
+
+		window.onload = function() {
+   			var clearButton = document.getElementById("clearButton");
+    		clearButton.onclick = handleClearButton;
+
+    		canvas  = document.getElementById("myCanvas");
+    		context = canvas.getContext("2d");
+    		canvas.onmousedown = handleMouseDown;
+    		canvas.onmouseup   = handleMouseUp;
+    		canvas.onmousemove = handleMouseMove;
+
+    		var coords = localStorage["coords"];
+    		if (coords) {
+        		coords = JSON.parse(coords);
+        
+        		for (var i = 0; i < coords.length; i = i + 2) {
+            		paintToCanvas(coords[i], coords[i + 1]);
+        		}
+    		}
+    		
+		}
+
+		function handleClearButton() {
+    		context.clearRect(0, 0, canvas.width, canvas.height);
+
+    		localStorage.removeItem("coords");
+		}
+
+		function handleMouseDown(event) {
+    		paintFromMouse(event);
+
+    		mouseDown = true;
+		}
+
+		function handleMouseUp(event) {
+   			mouseDown = false;
+		}
+
+		function handleMouseMove(event) {
+    		if (mouseDown) {
+        		paintFromMouse(event);
+    		}
+		}
+
+		var brushSize = 16;
+		
+		//var colorPurple = document.getElementById("colorPurple")
+		//colorPurple = "#cb3594"
+		
+		//var curColor = "#000000"
+		//var clickColor = new Array();
+
+		function paintFromMouse(event) {
+    		var x = event.clientX - canvas.offsetLeft;
+    		var y = event.clientY - canvas.offsetTop;
+    		paintToCanvas(x, y);
+    		
+    		//clickColor.push(curColor);
+
+    		var coords = localStorage["coords"];
+    		if (coords) {
+        		coords = JSON.parse(coords);
+    		}
+    		else {
+        		coords = [];
+    		}
+    		coords.push(x);
+    		coords.push(y);
+    		localStorage.setItem("coords", JSON.stringify(coords));
+		}
+
+		function paintToCanvas(x, y) {
+   			context.fillRect(x  - brushSize/2, y  - brushSize/2, brushSize, brushSize);
+   			//context.strokeStyle = clickColor[i];
+   			//context.stroke();
+		}
+    </script>
+</head>
+<body>
+    <canvas width="300" height="300" id="myCanvas"></canvas>
+    <br >
+    <input type="button" id="clearButton" value="Clear">
+    <input type="button" id="colorPurple" value="Purple">
+</body>
+</html>
